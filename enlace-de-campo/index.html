@@ -1,0 +1,869 @@
+<title>Enlace de Campo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Diseño: riel lateral + página de una columna en escritorio; barra de pestañas inferior en teléfono.
+   Gris azulado de planta externa, acento naranja de balizaje de torres, tipografía de señalética. */
+:root{
+  --bg:#EDF0F4;--surface:#FFFFFF;--surface-2:#E4E9EF;--ink:#13202C;--ink-2:#465463;--line:#CBD3DC;
+  --accent:#B93C0B;--accent-ink:#FFFFFF;--accent-soft:#FDE8DC;
+  --ok:#17673F;--ok-soft:#DCF2E5;--warn:#8A5A00;--warn-soft:#FBEDC3;--bad:#B0201A;--bad-soft:#FCE3E0;--on-bad:#FFFFFF;
+  --focus:#1D5FA8;
+  --font-display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --radius:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1620;--surface:#15212D;--surface-2:#1C2B3A;--ink:#E6ECF2;--ink-2:#9FB0C0;--line:#2B3C4D;
+  --accent:#FF8A50;--accent-ink:#1B0E05;--accent-soft:#3A2113;
+  --ok:#5BD08F;--ok-soft:#12301F;--warn:#F2C14E;--warn-soft:#3A2E0E;--bad:#FF8277;--bad-soft:#3B1613;--on-bad:#2A0B08;
+  --focus:#6FB0F2;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1620;--surface:#15212D;--surface-2:#1C2B3A;--ink:#E6ECF2;--ink-2:#9FB0C0;--line:#2B3C4D;
+  --accent:#FF8A50;--accent-ink:#1B0E05;--accent-soft:#3A2113;
+  --ok:#5BD08F;--ok-soft:#12301F;--warn:#F2C14E;--warn-soft:#3A2E0E;--bad:#FF8277;--bad-soft:#3B1613;--on-bad:#2A0B08;
+  --focus:#6FB0F2;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--font-body);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-family:var(--font-display);font-weight:600;text-wrap:balance}
+p{margin:0}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);gap:32px;max-width:1240px;margin:0 auto;padding-block:20px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail{position:sticky;top:20px;align-self:start;display:flex;flex-direction:column;gap:22px}
+.brand h1{font-size:28px;line-height:1;letter-spacing:.01em}
+.brand small{display:block;margin-top:5px;color:var(--ink-2);font-size:12px;letter-spacing:.09em;text-transform:uppercase}
+.fibra{display:flex;height:6px;margin-top:10px;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.fibra i{flex:1}
+.logo{display:flex;align-items:center;gap:10px}
+.logo .mark{width:44px;height:44px;flex:none}
+.logo b{display:block;font:700 30px/1 var(--font-display);letter-spacing:.06em}
+.logo span{display:block;margin-top:4px;font:600 11.5px/1 var(--font-body);letter-spacing:.34em;color:var(--ink-2)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border:0;border-radius:var(--radius);background:none;color:var(--ink-2);font-weight:500;text-align:left;cursor:pointer}
+.nav-item:hover{background:var(--surface-2);color:var(--ink)}
+.nav-item.on{background:var(--ink);color:var(--surface)}
+.who{font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
+.main-col{min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;margin-bottom:20px}
+.brandm{display:none}
+.brandm h1{font-size:24px;line-height:1}
+.tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.zsel{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2)}
+.sync i{width:9px;height:9px;border-radius:50%;background:var(--warn)}
+.sync.on i{background:var(--ok)} .sync.off i{background:var(--bad)}
+
+input:not([type=checkbox]):not([type=file]),select,textarea{width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+textarea{resize:vertical;line-height:1.4}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--accent);border-radius:var(--radius);background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.bad{background:var(--bad);border-color:var(--bad);color:var(--on-bad)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:24px;padding:0 9px;border-radius:12px;background:var(--surface-2);color:var(--ink-2);font-size:12.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}.chip.acc{background:var(--accent-soft);color:var(--accent)}
+
+.vh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 20px;margin-bottom:18px}
+.vh h2{font-size:38px;line-height:1}
+.sub{color:var(--ink-2);margin-top:6px;max-width:62ch}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:28px 0 10px}
+.sec h3{font-size:23px}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:8px}
+.strip>div{background:var(--surface);padding:12px 16px}
+.k{font:600 36px/1 var(--font-display);font-variant-numeric:tabular-nums}
+.kl{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:4px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+.tabs button{min-height:44px;padding:0 14px;border:0;border-bottom:3px solid transparent;background:none;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.tabs button.on{color:var(--ink);border-color:var(--accent)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.bar>*{flex:1 1 170px;min-width:0}
+.bar>.btn{flex:0 0 auto}
+
+.rows{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.row{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);min-width:0}
+.row:first-child{border-top:0}
+.row.sev-bad::before,.row.sev-warn::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--bad)}
+.row.sev-warn::before{background:var(--warn)}
+.row .main{flex:1;min-width:0}
+.row .t{font-weight:600;overflow-wrap:anywhere}
+.row .m{display:flex;flex-wrap:wrap;gap:2px 14px;color:var(--ink-2);font-size:13.5px}
+.row .side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.row.click{cursor:pointer}.row.click:hover{background:var(--surface-2)}
+.qty{font:600 28px/1 var(--font-display);font-variant-numeric:tabular-nums;text-align:right;min-width:3ch}
+.qty small{font:500 13px var(--font-body);color:var(--ink-2);margin-left:3px}
+@media (max-width:560px){.row{flex-wrap:wrap}.row .side{width:100%;justify-content:flex-start}}
+.empty{padding:28px 16px;text-align:center;color:var(--ink-2);border:1px dashed var(--line);border-radius:var(--radius);background:var(--surface)}
+.empty h3{font-size:22px;color:var(--ink);margin-bottom:6px}
+.note{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid var(--warn);background:var(--warn-soft);border-radius:var(--radius);margin-bottom:18px}
+
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld>span{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.fld small{color:var(--ink-2);font-size:13px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px}
+.scrim{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(8,14,22,.6)}
+.scrim[hidden],.toast[hidden]{display:none}
+.sheet{width:min(680px,100%);max-height:92dvh;overflow:auto;background:var(--surface);border-radius:12px 12px 0 0;display:flex;flex-direction:column;gap:14px;
+  padding:20px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){.scrim{align-items:center}.sheet{border-radius:10px;padding:24px}}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sh h3{font-size:28px;line-height:1.05}
+.foot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:15px}
+.kv dt{color:var(--ink-2)}.kv dd{margin:0;overflow-wrap:anywhere}
+
+.it{display:flex;flex-direction:column;gap:10px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.it.no{border-color:var(--bad)}.it.good{border-color:var(--ok)}
+.it .q{font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 1px var(--ink-2);flex:none}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.yn button{min-height:52px;border:2px solid var(--line);border-radius:var(--radius);background:var(--surface);font-weight:600;cursor:pointer}
+.yn button.on.y{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.yn button.on.n{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.med{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.med input{max-width:170px;font:500 22px var(--font-mono)}
+.prog{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumbs div{position:relative}
+.thumbs img{display:block;width:84px;height:84px;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+.thumbs button{position:absolute;top:2px;right:2px;width:26px;height:26px;border:0;border-radius:50%;background:var(--ink);color:var(--surface);cursor:pointer;display:grid;place-items:center}
+.stack{display:flex;flex-direction:column;gap:10px}
+.turnos{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.tu{display:flex;flex-direction:column;align-items:center;padding:6px 0;border-radius:4px;background:var(--surface-2);font-size:12px;color:var(--ink-2)}
+.tu b{font:600 19px var(--font-display);color:var(--ink)}
+.tu.L{opacity:.5}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:60;max-width:min(92vw,520px);padding:12px 16px;border-radius:var(--radius);background:var(--ink);color:var(--bg);font-weight:500}
+.toast.bad{background:var(--bad);color:var(--on-bad)}
+
+.tabbar{display:none}
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0;padding-bottom:96px}
+  .rail{display:none}
+  .brandm{display:block}
+  .vh h2{font-size:32px}
+  .tabbar{position:fixed;inset:auto 0 0 0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);
+    padding:4px max(8px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .tabbar .nav-item{flex-direction:column;justify-content:center;gap:2px;min-height:56px;padding:0;font-size:11.5px;text-align:center}
+  .tabbar .nav-item[data-v=auditoria]{display:none}
+}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.4c2.2.7 3.5 2.6 3.5 5.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V5m0 0-4 4m4-4 4 4M5 20h14"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h14m0 0-4-4m4 4-4 4M20 16H6m0 0 4-4m-4 4 4 4"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></symbol>
+</defs></svg>
+<div id="app" class="shell"><div class="empty" style="grid-column:1/-1"><h3>Cargando Enlace de Campo</h3>Conectando con la base de datos…</div></div>
+<div id="modal" class="scrim" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(() => {
+'use strict';
+/* ---------- utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const hoy = () => isoDate(new Date());
+const diasHasta = f => Math.round((new Date(f + 'T00:00:00') - new Date(hoy() + 'T00:00:00')) / 864e5);
+const fFecha = f => f ? new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(f + 'T00:00:00')) : '—';
+const fHora = t => t ? new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(t)) : '—';
+const num = (n, d = 0) => new Intl.NumberFormat('es-PE', { maximumFractionDigits: d }).format(n ?? 0);
+const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const ic = (n, c = '') => `<svg class="ic ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const opts = (arr, sel, vacio) => (vacio ? `<option value="">${esc(vacio)}</option>` : '') +
+  arr.map(o => { const [v, t] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}"${v === sel ? ' selected' : ''}>${esc(t)}</option>`; }).join('');
+const val = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+const chk = id => { const e = document.getElementById(id); return !!(e && e.checked); };
+
+/* ---------- constantes del rubro ---------- */
+const NAV = [['panel', 'Panel', 'grid'], ['checklists', 'Checklists', 'check'], ['manuales', 'Manuales', 'book'], ['inventario', 'Inventario', 'box'], ['personal', 'Personal', 'users'], ['auditoria', 'Registro', 'clock']];
+const CAT_MANUAL = ['Instalación', 'Mantenimiento', 'Fibra óptica', 'Radioenlaces', 'Torres', 'Seguridad', 'Emergencias'];
+const CAT_INV = ['Fibra y cable', 'Equipos activos', 'Antenas y radio', 'Energía', 'Conectividad', 'Instrumentos y herramientas', 'EPP y seguridad'];
+const EST_INV = ['nuevo', 'en uso', 'en reparación', 'baja'];
+const TIPOS_CL = ['Instalación', 'Mantenimiento preventivo', 'Inspección de torre', 'Revisión de sitio', 'Cierre de incidencia'];
+const FIBRA = [['Azul', '#1f5fbf'], ['Naranja', '#f08a1c'], ['Verde', '#2e9a4a'], ['Marrón', '#7a4a25'], ['Pizarra', '#6b7785'], ['Blanco', '#ffffff'],
+  ['Rojo', '#d32f2f'], ['Negro', '#111111'], ['Amarillo', '#f2d21b'], ['Violeta', '#7b3fa0'], ['Rosa', '#ef7fa8'], ['Celeste', '#2bb5d8']];
+const TURNOS = { M: 'Mañana', T: 'Tarde', N: 'Noche', L: 'Libre' };
+const DIAS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+const VIEWS = NAV.map(n => n[0]);
+
+/* ---------- estado ---------- */
+const S = {
+  view: 'panel', zona: '', f: {}, run: null, booted: false, synced: false, slow: false, err: '',
+  d: { zonas: [], personal: [], manuales: [], plantillas: [], asignaciones: [], ejecuciones: [], inventario: [], movimientos: [], lecturas: [], auditoria: [] },
+  me: { id: null, name: '' }, names: {},
+  caps: { db: false, write: null, admin: false, owner: false, upload: false, save: false }
+};
+let DB = null, USER = null, ASSETS = null, DL = null;
+const puede = () => S.caps.write !== false;
+const esAdmin = () => S.caps.admin || S.caps.owner;
+const rol = () => S.caps.owner ? 'Administrador' : S.caps.admin ? 'Supervisor' : S.caps.write === false ? 'Solo lectura' : 'Técnico';
+const zonaNombre = id => (S.d.zonas.find(z => z.id === id) || {}).nombre || '—';
+const enZona = o => !S.zona || o.zonaId === S.zona;
+
+/* nombres de usuarios: se guardan solo ids y se resuelven al mostrar */
+const pend = new Set();
+const nombreDe = id => !id ? '—' : id === S.me.id ? (S.me.name || 'Tú') : (S.names[id] || 'Alguien');
+function quiero(ids) {
+  if (!USER) return;
+  const falta = [...new Set(ids)].filter(i => i && S.names[i] === undefined && !pend.has(i));
+  if (!falta.length) return;
+  falta.forEach(i => pend.add(i));
+  USER.profiles(falta).then(ps => { falta.forEach(i => { S.names[i] = (ps[i] && ps[i].name) || ''; pend.delete(i); }); sched(); });
+}
+
+/* ---------- escritura con registro de auditoría ---------- */
+const col = n => DB.collection(n);
+function log(accion, detalle, c, ref) {
+  col('auditoria').add({ ts: Date.now(), uid: S.me.id, accion, detalle: detalle || '', col: c || '', ref: ref || '' }).catch(() => {});
+}
+async function guardar(c, id, data, accion, detalle) {
+  const r = id ? col(c).doc(id) : col(c).doc();
+  await r.set(data); log(accion, detalle, c, r.id); return r.id;
+}
+async function parchar(c, id, patch, accion, detalle) { await col(c).doc(id).update(patch); log(accion, detalle, c, id); }
+async function borrar(c, id, accion, detalle) { await col(c).doc(id).delete(); log(accion, detalle, c, id); }
+const errMsg = e => e && e.code === 'invalid_argument' ? 'Tu nivel de acceso no permite este cambio.'
+  : e && e.code === 'quota_exceeded' ? 'Se llenó la base de datos. Borra registros antiguos.' : 'No se pudo guardar. Revisa tu conexión e intenta de nuevo.';
+async function hacer(fn, ok) {
+  try { await fn(); if (ok) toast(ok); return true; } catch (e) { toast(errMsg(e), 'bad'); return false; }
+}
+
+/* ---------- avisos y ventanas ---------- */
+let tt;
+function toast(msg, kind = 'ok') {
+  const t = $('#toast'); t.textContent = msg; t.className = 'toast ' + (kind === 'bad' ? 'bad' : ''); t.hidden = false;
+  clearTimeout(tt); tt = setTimeout(() => { t.hidden = true; }, 4200);
+}
+function modal(html) {
+  const m = $('#modal'); m.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`; m.hidden = false; document.body.style.overflow = 'hidden';
+}
+function cerrar() { const m = $('#modal'); m.hidden = true; m.innerHTML = ''; document.body.style.overflow = ''; }
+let preguntaFn = null;
+function preguntar(titulo, texto, btn, fn) {
+  preguntaFn = fn;
+  modal(`<div class="sh"><h3>${esc(titulo)}</h3></div><p>${esc(texto)}</p>
+    <div class="foot"><button class="btn ghost" data-a="cerrar">Cancelar</button><button class="btn bad" data-a="si">${esc(btn)}</button></div>`);
+}
+const cabModal = t => `<div class="sh"><h3>${esc(t)}</h3><button class="btn ghost sm" data-a="cerrar" aria-label="Cerrar">${ic('x')}</button></div>`;
+
+/* ---------- descarga de archivos ---------- */
+const csvCelda = v => { const s = String(v ?? ''); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+const toCsv = (cols, rows) => '﻿' + [cols.map(c => csvCelda(c[0])).join(','), ...rows.map(r => cols.map(c => csvCelda(c[1](r))).join(','))].join('\r\n');
+async function descargar(nombre, data) {
+  if (!DL) return toast('Esta vista no permite descargar archivos.', 'bad');
+  try { await DL.save({ filename: nombre, data }); toast('Archivo listo.'); }
+  catch (e) { if (!e || e.code !== 'declined') toast('No se pudo descargar el archivo.', 'bad'); }
+}
+
+/* ---------- dibujo ---------- */
+let raf = 0;
+const sched = () => { if (S.view === 'ejecutar') return; cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
+function draw() {
+  const a = document.activeElement, id = a && a.id, s0 = a && a.selectionStart, s1 = a && a.selectionEnd, y = window.scrollY;
+  $('#app').innerHTML = shell();
+  if (id) { const n = document.getElementById(id); if (n) { n.focus(); try { if (s0 != null) n.setSelectionRange(s0, s1); } catch (_) {} } }
+  window.scrollTo(0, y);
+}
+function ir(v) {
+  S.view = v; S.f = {}; draw(); window.scrollTo(0, 0);
+  if (VIEWS.includes(v)) { try { history.replaceState(null, '', '#' + v); } catch (_) { location.hash = v; } }
+}
+const logo = () => `<div class="logo" role="img" aria-label="Kuntur Telecom"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><path d="M5 41 22 17l17 24z" fill="var(--ink)"/><path d="M17.8 12.8A6 6 0 0 1 26.2 12.8M14.2 9.2A11 11 0 0 1 29.8 9.2M10.7 5.7A16 16 0 0 1 33.3 5.7" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"/></svg><div><b>KUNTUR</b><span>TELECOM</span></div></div>`;
+const fibraStrip = () => `<div class="fibra" title="Código de colores de fibra">${FIBRA.map(f => `<i style="background:${f[1]}"></i>`).join('')}</div>`;
+
+function shell() {
+  const nav = NAV.map(([v, t, i]) => `<button class="nav-item${S.view === v || (S.view === 'ejecutar' && v === 'checklists') ? ' on' : ''}" data-a="ir" data-v="${v}">${ic(i)}<span>${t}</span></button>`).join('');
+  const zs = S.d.zonas.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0));
+  const estado = S.err ? ['off', 'Sin acceso a datos'] : S.synced ? ['on', 'En línea'] : [S.slow ? 'off' : '', S.slow ? 'Sin respuesta, mostrando datos guardados' : 'Conectando…'];
+  return `<aside class="rail"><div class="brand">${logo()}<small>Enlace de Campo · operaciones de red</small>${fibraStrip()}</div>
+    <nav class="nav">${nav}</nav>
+    <div class="who"><span class="chip acc" style="align-self:flex-start">${esc(rol())}</span><span>${esc(S.me.name || '')}</span></div></aside>
+  <div class="main-col"><div class="topbar"><div class="brandm">${logo()}</div>
+    <div class="tools"><label class="zsel">Zona <select id="zonaSel" data-i="zona" style="width:auto;min-width:170px">${opts(zs.map(z => [z.id, z.nombre]), S.zona, 'Todas las zonas')}</select></label>
+    <span class="sync ${estado[0]}"><i></i>${esc(estado[1])}</span></div></div>
+    <main class="page">${vista()}</main></div><nav class="tabbar">${nav}</nav>`;
+}
+function vista() {
+  if (!S.booted) return `<div class="empty"><h3>Cargando</h3>Conectando con la base de datos…</div>`;
+  if (!S.caps.db) return `<div class="empty"><h3>Sin base de datos</h3>Abre este enlace con tu sesión de Claude para ver y guardar los datos de la empresa.</div>`;
+  return ({ panel: vPanel, checklists: vChecklists, manuales: vManuales, inventario: vInventario, personal: vPersonal, auditoria: vAuditoria, ejecutar: vEjecutar }[S.view] || vPanel)();
+}
+const vacio = (t, s) => `<div class="empty"><h3>${esc(t)}</h3>${esc(s || '')}</div>`;
+const cab = (t, sub, acts) => `<header class="vh"><div><h2>${esc(t)}</h2>${sub ? `<p class="sub">${sub}</p>` : ''}</div><div class="acts">${acts || ''}</div></header>`;
+const btn = (a, t, icon, cls = '', data = '') => `<button class="btn ${cls}" data-a="${a}" ${data}>${icon ? ic(icon) : ''}${esc(t)}</button>`;
+
+/* ---------- acciones (se enlazan por data-a) ---------- */
+const A = {};
+A.ir = d => ir(d.v);
+A.cerrar = cerrar;
+A.si = () => { const f = preguntaFn; preguntaFn = null; cerrar(); if (f) f(); };
+A.setZona = d => { S.zona = d.id || ''; draw(); };
+
+async function resolver(ids) {
+  if (!USER) return;
+  const falta = [...new Set(ids)].filter(i => i && S.names[i] === undefined);
+  if (!falta.length) return;
+  try { const ps = await USER.profiles(falta); falta.forEach(i => { S.names[i] = (ps[i] && ps[i].name) || ''; }); } catch (_) {}
+}
+const TIPOS = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif', mp4: 'video/mp4', webm: 'video/webm', txt: 'text/plain', md: 'text/markdown', csv: 'text/csv' };
+const tipoArchivo = f => TIPOS[(f.name.split('.').pop() || '').toLowerCase()] || null;
+async function subir(file, tipo) {
+  if (!ASSETS) { toast('Esta vista no permite subir archivos.', 'bad'); return null; }
+  const t = tipo || tipoArchivo(file);
+  if (!t) { toast('Formato no admitido. Usa PDF, imagen, MP4/WebM o texto. Un Word se guarda antes como PDF.', 'bad'); return null; }
+  try { return await ASSETS.upload(file, { type: t }); }
+  catch (e) { toast(e && e.code === 'too_large' ? 'El archivo supera los 20 MB.' : e && e.code === 'quota_or_state' ? 'Se llenó el espacio de archivos.' : 'No se pudo subir el archivo.', 'bad'); return null; }
+}
+
+/* ---------- consultas compartidas ---------- */
+const asigPend = () => S.d.asignaciones.filter(a => enZona(a) && !S.d.ejecuciones.some(e => e.asignacionId === a.id && e.estado !== 'borrador'));
+const leido = m => S.d.lecturas.some(l => l.manualId === m.id && l.uid === S.me.id && l.version === m.version);
+const sinLeer = () => S.me.id ? S.d.manuales.filter(m => m.obligatorio && !leido(m)) : [];
+const stockBajo = () => S.d.inventario.filter(i => enZona(i) && i.minimo > 0 && i.cantidad <= i.minimo && i.estado !== 'baja');
+const certsAlerta = () => {
+  const o = [];
+  S.d.personal.filter(enZona).forEach(p => (p.certs || []).forEach(c => { const d = diasHasta(c.vence); if (d <= 30) o.push({ p, c, d }); }));
+  return o.sort((a, b) => a.d - b.d);
+};
+const chipVence = f => { const d = diasHasta(f); return d < 0 ? `<span class="chip bad">Vencido hace ${-d} d</span>` : d === 0 ? `<span class="chip warn">Vence hoy</span>` : `<span class="chip ${d <= 2 ? 'warn' : ''}">Vence en ${d} d</span>`; };
+
+/* ---------- panel ---------- */
+function vPanel() {
+  const pend = asigPend(), venc = pend.filter(a => a.vence < hoy()), bajos = stockBajo(), cs = certsAlerta(), sl = sinLeer();
+  const rev = esAdmin() ? S.d.ejecuciones.filter(e => enZona(e) && (e.estado === 'observaciones' || e.estado === 'rechazado') && !e.revision) : [];
+  const fl = [];
+  venc.forEach(a => fl.push({ s: 'bad', t: `Checklist vencido: ${a.plantillaNombre}`, m: `${a.sitio || zonaNombre(a.zonaId)} · venció ${fFecha(a.vence)}`, a: 'iniciarAsig', id: a.id, b: 'Iniciar' }));
+  cs.filter(x => x.d < 0).forEach(x => fl.push({ s: 'bad', t: `Certificación vencida: ${x.c.nombre}`, m: `${x.p.nombre} · venció ${fFecha(x.c.vence)}`, a: 'ir', v: 'personal', b: 'Ver personal' }));
+  bajos.filter(i => i.cantidad <= 0).forEach(i => fl.push({ s: 'bad', t: `Sin stock: ${i.nombre}`, m: `${zonaNombre(i.zonaId)} · mínimo ${num(i.minimo)} ${i.unidad || ''}`, a: 'mover', id: i.id, b: 'Registrar entrada' }));
+  pend.filter(a => a.vence >= hoy() && diasHasta(a.vence) <= 2).forEach(a => fl.push({ s: 'warn', t: `Checklist por vencer: ${a.plantillaNombre}`, m: `${a.sitio || zonaNombre(a.zonaId)} · ${fFecha(a.vence)}`, a: 'iniciarAsig', id: a.id, b: 'Iniciar' }));
+  cs.filter(x => x.d >= 0).forEach(x => fl.push({ s: 'warn', t: `Certificación por vencer: ${x.c.nombre}`, m: `${x.p.nombre} · en ${x.d} días (${fFecha(x.c.vence)})`, a: 'ir', v: 'personal', b: 'Ver personal' }));
+  bajos.filter(i => i.cantidad > 0).forEach(i => fl.push({ s: 'warn', t: `Stock bajo: ${i.nombre}`, m: `${zonaNombre(i.zonaId)} · quedan ${num(i.cantidad)} de mínimo ${num(i.minimo)}`, a: 'mover', id: i.id, b: 'Registrar entrada' }));
+  sl.forEach(m => fl.push({ s: 'warn', t: `Manual obligatorio sin leer: ${m.titulo}`, m: `Versión ${m.version}`, a: 'verManual', id: m.id, b: 'Abrir' }));
+  rev.forEach(e => fl.push({ s: 'warn', t: `Checklist con observaciones: ${e.plantillaNombre}`, m: `${e.sitio || zonaNombre(e.zonaId)} · ${fHora(e.ts)}`, a: 'verRun', id: e.id, b: 'Revisar' }));
+  const lista = fl.slice(0, 14);
+  const ahora = new Date(), delMes = e => { const d = new Date(e.ts); return d.getMonth() === ahora.getMonth() && d.getFullYear() === ahora.getFullYear() && e.estado !== 'borrador'; };
+  const zonas = S.d.zonas.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0));
+  const filasZ = zonas.map(z => {
+    const ps = S.d.personal.filter(p => p.zonaId === z.id).length, inv = S.d.inventario.filter(i => i.zonaId === z.id);
+    const bj = inv.filter(i => i.minimo > 0 && i.cantidad <= i.minimo && i.estado !== 'baja').length, tr = S.d.ejecuciones.filter(e => e.zonaId === z.id && delMes(e)).length;
+    return `<div class="row click" data-a="setZona" data-id="${z.id}"><div class="main"><div class="t">${esc(z.nombre)}</div><div class="m"><span>${ps} en personal</span><span>${inv.length} ítems</span><span>${tr} checklists este mes</span></div></div>
+      <div class="side">${bj ? `<span class="chip warn">${bj} con stock bajo</span>` : `<span class="chip ok">Stock al día</span>`}</div></div>`;
+  }).join('');
+  quiero(S.d.auditoria.slice(0, 8).map(a => a.uid));
+  const act = S.d.auditoria.slice(0, 8).map(a => `<div class="row"><div class="main"><div class="t">${esc(a.accion)}</div><div class="m"><span>${esc(a.detalle)}</span></div></div><div class="side"><span class="m">${esc(nombreDe(a.uid))} · ${fHora(a.ts)}</span></div></div>`).join('');
+  const hayEj = Object.values(S.d).some(arr => arr.some(x => x.ejemplo));
+  return cab('Panel', S.zona ? `Zona: ${esc(zonaNombre(S.zona))}` : 'Todas las zonas', btn('ir', 'Nuevo checklist', 'plus', '', 'data-v="checklists"')) +
+    (hayEj ? `<div class="note"><span>Estás viendo datos de ejemplo. Bórralos cuando cargues los reales.</span>${esAdmin() ? btn('borrarEj', 'Borrar datos de ejemplo', '', 'ghost sm') : ''}</div>` : '') +
+    `<div class="strip"><div><div class="k">${pend.length}</div><div class="kl">Checklists pendientes</div></div><div><div class="k" style="color:${venc.length ? 'var(--bad)' : 'inherit'}">${venc.length}</div><div class="kl">Vencidos</div></div>
+      <div><div class="k">${bajos.length}</div><div class="kl">Con stock bajo</div></div><div><div class="k">${cs.length}</div><div class="kl">Certificaciones por vencer</div></div>${S.me.id ? `<div><div class="k">${sl.length}</div><div class="kl">Manuales sin leer</div></div>` : ''}</div>
+    <div class="sec"><h3>Atención ahora</h3></div>` +
+    (lista.length ? `<div class="rows">${lista.map(x => `<div class="row sev-${x.s}"><div class="main"><div class="t">${esc(x.t)}</div><div class="m"><span>${esc(x.m)}</span></div></div><div class="side"><button class="btn ghost sm" data-a="${x.a}" ${x.id ? `data-id="${x.id}"` : ''} ${x.v ? `data-v="${x.v}"` : ''}>${esc(x.b)}</button></div></div>`).join('')}</div>${fl.length > 14 ? `<p class="sub">y ${fl.length - 14} avisos más</p>` : ''}` : vacio('Todo en orden', 'No hay checklists vencidos, certificaciones por vencer ni stock bajo.')) +
+    `<div class="sec"><h3>Por zona</h3></div>${zonas.length ? `<div class="rows">${filasZ}</div>` : vacio('Aún no hay zonas', 'Un supervisor puede crearlas desde Inventario o Personal.')}
+    <div class="sec"><h3>Últimas actividades</h3>${btn('ir', 'Ver registro', '', 'ghost sm', 'data-v="auditoria"')}</div>${act ? `<div class="rows">${act}</div>` : vacio('Sin actividad todavía')}`;
+}
+A.borrarEj = () => preguntar('Borrar datos de ejemplo', 'Se eliminan solo los registros marcados como ejemplo. Tus datos reales no se tocan.', 'Borrar ejemplos', async () => {
+  await hacer(async () => {
+    for (const c of ['zonas', 'personal', 'manuales', 'plantillas', 'asignaciones', 'ejecuciones', 'inventario', 'movimientos', 'lecturas']) {
+      const sn = await col(c).where('ejemplo', '==', true).get();
+      for (const d of sn.docs) await col(c).doc(d.id).delete();
+    }
+    log('Borró datos de ejemplo', '');
+  }, 'Datos de ejemplo borrados.');
+});
+
+/* ---------- manuales ---------- */
+function vManuales() {
+  const q = norm(S.f.q), c = S.f.cat || '';
+  const ls = S.d.manuales.filter(m => (!c || m.categoria === c) && (!q || norm(m.titulo + ' ' + (m.notas || '')).includes(q))).sort((a, b) => norm(a.titulo) < norm(b.titulo) ? -1 : 1);
+  const filas = ls.map(m => `<div class="row click" data-a="verManual" data-id="${m.id}"><div class="main"><div class="t">${esc(m.titulo)}</div>
+    <div class="m"><span>${esc(m.categoria)}</span><span>Versión ${esc(m.version)}</span><span>${fFecha(m.fecha)}</span></div></div>
+    <div class="side">${m.obligatorio ? `<span class="chip acc">Obligatorio</span>${S.me.id ? (leido(m) ? '<span class="chip ok">Leído</span>' : '<span class="chip warn">Sin leer</span>') : ''}` : ''}
+    <span class="chip">${m.asset ? esc((m.asset.nombre.split('.').pop() || 'archivo').toUpperCase()) : 'Sin archivo'}</span></div></div>`).join('');
+  return cab('Manuales de operación', 'Procedimientos vigentes de instalación, mantenimiento y seguridad.', esAdmin() ? btn('nuevoManual', 'Subir manual', 'up') : '') +
+    `<div class="bar"><input id="qMan" type="search" placeholder="Buscar por nombre o palabra clave" value="${esc(S.f.q || '')}" data-i="q"><select id="cMan" data-i="cat">${opts(CAT_MANUAL, c, 'Todas las categorías')}</select></div>` +
+    (ls.length ? `<div class="rows">${filas}</div>` : vacio('No hay manuales', S.d.manuales.length ? 'Prueba con otra búsqueda o categoría.' : 'Sube el primer manual para que el equipo lo consulte.'));
+}
+A.verManual = async d => {
+  const m = S.d.manuales.find(x => x.id === d.id); if (!m) return;
+  const lect = S.d.lecturas.filter(l => l.manualId === m.id && l.version === m.version);
+  if (esAdmin()) await resolver(lect.map(l => l.uid));
+  const arch = x => x ? `<a class="btn sm" style="text-decoration:none" href="/_blob/${x.id}" target="_blank" rel="noopener">${ic('file')}Abrir ${esc(x.nombre)}</a>` : '<span class="chip">Sin archivo adjunto</span>';
+  modal(cabModal(m.titulo) + `<div class="acts">${m.obligatorio ? '<span class="chip acc">Obligatorio</span>' : ''}<span class="chip">${esc(m.categoria)}</span><span class="chip">Versión ${esc(m.version)}</span><span class="chip">${fFecha(m.fecha)}</span></div>
+    ${m.notas ? `<p>${esc(m.notas)}</p>` : ''}<div>${arch(m.asset)}</div>
+    ${(m.historial || []).length ? `<div class="stack"><b>Versiones anteriores</b>${m.historial.map(h => `<div class="row" style="border:1px solid var(--line);border-radius:6px"><div class="main"><div class="t">Versión ${esc(h.version)}</div><div class="m"><span>${fFecha(h.fecha)}</span></div></div><div class="side">${h.asset ? arch(h.asset) : ''}</div></div>`).join('')}</div>` : ''}
+    ${esAdmin() ? `<div class="stack"><b>Leído por (${lect.length})</b><p class="sub">${lect.length ? lect.map(l => esc(nombreDe(l.uid))).join(', ') : 'Nadie ha confirmado la lectura de esta versión.'}</p></div>` : ''}
+    <div class="foot">${esAdmin() ? btn('editarManual', 'Editar o subir versión', 'up', 'ghost', `data-id="${m.id}"`) + btn('delManual', 'Eliminar', '', 'ghost', `data-id="${m.id}"`) : ''}
+    ${puede() && S.me.id ? (leido(m) ? '<span class="chip ok">Ya lo marcaste como leído</span>' : btn('leer', 'Marcar como leído', '', '', `data-id="${m.id}"`)) : ''}</div>`);
+};
+A.leer = d => { const m = S.d.manuales.find(x => x.id === d.id); if (!m) return;
+  hacer(async () => { await guardar('lecturas', S.me.id + '_' + m.id, { uid: S.me.id, manualId: m.id, version: m.version, ts: Date.now() }, 'Leyó manual', m.titulo); cerrar(); }, 'Lectura registrada.'); };
+function formManual(m) {
+  m = m || {};
+  modal(cabModal(m.id ? 'Editar manual' : 'Subir manual') + `<div class="stack">
+    <label class="fld"><span>Título</span><input id="mTit" type="text" value="${esc(m.titulo || '')}"></label>
+    <div class="g2"><label class="fld"><span>Categoría</span><select id="mCat">${opts(CAT_MANUAL, m.categoria)}</select></label>
+    <label class="fld"><span>Versión</span><input id="mVer" type="text" value="${esc(m.version || '1.0')}"></label>
+    <label class="fld"><span>Fecha de la versión</span><input id="mFec" type="date" value="${esc(m.fecha || hoy())}"></label></div>
+    <label class="chk"><input id="mObl" type="checkbox" ${m.obligatorio ? 'checked' : ''}>Obligatorio de leer para todo el personal</label>
+    <label class="fld"><span>Notas</span><textarea id="mNot" rows="2">${esc(m.notas || '')}</textarea></label>
+    <label class="fld"><span>Archivo ${m.asset ? '(déjalo vacío para conservar el actual)' : ''}</span><input id="mFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.mp4,.webm,.txt,.md,.csv">
+    <small>PDF, imágenes, video MP4/WebM o texto, hasta 20 MB. Si tu manual está en Word, guárdalo como PDF antes.${S.caps.upload ? '' : ' Esta vista no permite subir archivos.'}</small></label>
+    <small>Si cambias el número de versión, la anterior queda en el historial y se pide leer de nuevo.</small></div>
+    <div class="foot"><button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('guardarManual', 'Guardar manual', '', '', `data-id="${m.id || ''}"`)}</div>`);
+}
+A.nuevoManual = () => formManual();
+A.editarManual = d => formManual(S.d.manuales.find(x => x.id === d.id));
+A.guardarManual = async d => {
+  const prev = S.d.manuales.find(m => m.id === d.id), titulo = val('mTit');
+  if (!titulo) return toast('Escribe el título del manual.', 'bad');
+  const f = $('#mFile').files[0]; let asset = prev ? prev.asset || null : null;
+  if (f) { const r = await subir(f); if (!r) return; asset = { id: r.id, nombre: f.name, tipo: r.contentType, tam: r.sizeBytes }; }
+  const version = val('mVer') || '1.0', hist = prev && prev.historial ? prev.historial.slice() : [];
+  if (prev && prev.version !== version) hist.unshift({ version: prev.version, fecha: prev.fecha, asset: prev.asset || null });
+  const data = { titulo, categoria: val('mCat'), version, fecha: val('mFec') || hoy(), obligatorio: chk('mObl'), notas: val('mNot'), asset, historial: hist.slice(0, 20) };
+  if (prev && prev.ejemplo) data.ejemplo = true;
+  await hacer(async () => { await guardar('manuales', d.id || '', data, prev ? 'Actualizó manual' : 'Subió manual', `${titulo} v${version}`); cerrar(); }, 'Manual guardado.');
+};
+A.delManual = d => { const m = S.d.manuales.find(x => x.id === d.id); if (m) preguntar('Eliminar manual', `Se elimina “${m.titulo}” con su historial de versiones.`, 'Eliminar', () => hacer(async () => { await borrar('manuales', m.id, 'Eliminó manual', m.titulo); }, 'Manual eliminado.')); };
+
+/* ---------- checklists ---------- */
+const I = {}, C = {};
+const respondido = (i, x) => !!x && (i.unidad ? x.valor != null : x.ok === true || x.ok === false);
+const enFuera = (i, v) => v != null && ((i.min != null && v < i.min) || (i.max != null && v > i.max));
+const malo = (i, x) => !!x && (x.ok === false || (!!i.unidad && enFuera(i, x.valor)));
+const rangoTxt = i => i.min != null && i.max != null ? `${num(i.min, 2)} a ${num(i.max, 2)}` : i.min != null ? `mínimo ${num(i.min, 2)}` : i.max != null ? `máximo ${num(i.max, 2)}` : '';
+const chipEstado = e => e.revision && e.revision.estado === 'aprobado' ? '<span class="chip ok">Aprobado</span>'
+  : ({ completo: '<span class="chip ok">Completo</span>', observaciones: '<span class="chip warn">Con observaciones</span>', rechazado: '<span class="chip bad">Rechazado</span>', borrador: '<span class="chip">Borrador</span>' }[e.estado] || '');
+
+function itemsToText(items) {
+  return (items || []).map(i => (i.critico ? '! ' : '') + i.texto + (i.unidad ? ` = ${i.unidad}` + (i.min != null || i.max != null ? ` [${i.min ?? ''}..${i.max ?? ''}]` : '') : '') +
+    (i.manualId ? ' @' + ((S.d.manuales.find(m => m.id === i.manualId) || {}).titulo || '') : '')).join('\n');
+}
+function textToItems(t) {
+  return t.split('\n').map(l => l.trim()).filter(Boolean).map((l, n) => {
+    let critico = false, manualId = null;
+    if (l[0] === '!') { critico = true; l = l.slice(1).trim(); }
+    const at = l.lastIndexOf(' @');
+    if (at > -1) { const q = norm(l.slice(at + 2)), m = q && S.d.manuales.find(m => norm(m.titulo).includes(q)); if (m) manualId = m.id; l = l.slice(0, at).trim(); }
+    const it = { id: 'i' + n, texto: l, critico };
+    const r = l.match(/^(.*?)\s*=\s*(\S+)\s*(?:\[\s*(-?[\d.,]*)\s*\.\.\s*(-?[\d.,]*)\s*\])?\s*$/);
+    if (r) {
+      const p = s => s === '' || s == null ? null : parseFloat(s.replace(',', '.'));
+      it.texto = r[1]; it.unidad = r[2];
+      if (r[3] !== undefined) { it.min = p(r[3]); it.max = p(r[4]); }
+    }
+    if (manualId) it.manualId = manualId;
+    return it;
+  });
+}
+
+function vChecklists() {
+  const tab = S.f.tab || 'pend';
+  const tabs = `<div class="tabs">${[['pend', 'Pendientes'], ['plant', 'Plantillas'], ['hist', 'Historial']].map(([k, t]) => `<button class="${tab === k ? 'on' : ''}" data-a="tab" data-t="${k}">${t}</button>`).join('')}</div>`;
+  const acts = (puede() ? btn('iniciar', 'Iniciar checklist', 'check') : '') + (esAdmin() ? btn('asignar', 'Asignar', 'plus', 'ghost') : '');
+  let cuerpo = '';
+  if (tab === 'pend') {
+    const bor = S.d.ejecuciones.filter(e => e.estado === 'borrador' && e.uid === S.me.id && enZona(e));
+    const ps = asigPend().sort((a, b) => a.vence < b.vence ? -1 : 1);
+    cuerpo = (bor.length ? `<div class="sec" style="margin-top:0"><h3>Tus borradores</h3></div><div class="rows">${bor.map(e => `<div class="row"><div class="main"><div class="t">${esc(e.plantillaNombre)}</div><div class="m"><span>${esc(e.sitio || zonaNombre(e.zonaId))}</span><span>Guardado ${fHora(e.ts)}</span></div></div><div class="side">${btn('continuar', 'Continuar', '', 'sm', `data-id="${e.id}"`)}</div></div>`).join('')}</div>` : '') +
+      `<div class="sec"${bor.length ? '' : ' style="margin-top:0"'}><h3>Asignados</h3></div>` +
+      (ps.length ? `<div class="rows">${ps.map(a => `<div class="row${a.vence < hoy() ? ' sev-bad' : ''}"><div class="main"><div class="t">${esc(a.plantillaNombre)}</div><div class="m"><span>${esc(a.sitio || '')}</span><span>${esc(zonaNombre(a.zonaId))}</span>${a.nota ? `<span>${esc(a.nota)}</span>` : ''}</div></div>
+        <div class="side">${chipVence(a.vence)}${esAdmin() ? btn('delAsig', 'Quitar', '', 'ghost sm', `data-id="${a.id}"`) : ''}${puede() ? btn('iniciarAsig', 'Iniciar', '', 'sm', `data-id="${a.id}"`) : ''}</div></div>`).join('')}</div>` : vacio('No hay checklists pendientes', 'Un supervisor puede asignar uno a una zona o sitio.'));
+  } else if (tab === 'plant') {
+    const ls = S.d.plantillas.slice().sort((a, b) => norm(a.nombre) < norm(b.nombre) ? -1 : 1);
+    cuerpo = (esAdmin() ? `<div class="bar">${btn('nuevaPlantilla', 'Nueva plantilla', 'plus', 'ghost')}</div>` : '') +
+      (ls.length ? `<div class="rows">${ls.map(p => `<div class="row"><div class="main"><div class="t">${esc(p.nombre)}</div><div class="m"><span>${esc(p.tipo)}</span><span>${p.items.length} ítems</span><span>${p.items.filter(i => i.critico).length} críticos</span></div></div>
+        <div class="side">${esAdmin() ? btn('editarPlantilla', 'Editar', '', 'ghost sm', `data-id="${p.id}"`) : ''}${puede() ? btn('iniciar', 'Iniciar', '', 'sm', `data-id="${p.id}"`) : ''}</div></div>`).join('')}</div>` : vacio('No hay plantillas', 'Crea la primera plantilla de checklist.'));
+  } else {
+    const ls = S.d.ejecuciones.filter(e => enZona(e) && e.estado !== 'borrador').slice(0, 100);
+    cuerpo = `<div class="bar">${S.caps.save ? btn('csvCl', 'Exportar CSV', 'down', 'ghost') : ''}</div>` +
+      (ls.length ? `<div class="rows">${ls.map(e => `<div class="row click ${e.estado === 'rechazado' ? 'sev-bad' : e.estado === 'observaciones' && !e.revision ? 'sev-warn' : ''}" data-a="verRun" data-id="${e.id}"><div class="main"><div class="t">${esc(e.plantillaNombre)}</div><div class="m"><span>${esc(e.sitio || zonaNombre(e.zonaId))}</span><span>${esc(e.firma)}</span><span>${fHora(e.ts)}</span></div></div><div class="side">${chipEstado(e)}</div></div>`).join('')}</div>` : vacio('Sin checklists completados', 'Aquí quedará el historial con quién, cuándo y dónde.'));
+  }
+  return cab('Checklists', 'Guías paso a paso para instalar, mantener e inspeccionar.', acts) + tabs + cuerpo;
+}
+A.tab = d => { S.f = { tab: d.t }; draw(); };
+A.csvCl = () => descargar('checklists.csv', toCsv([['Fecha', e => new Date(e.ts).toISOString()], ['Checklist', e => e.plantillaNombre], ['Zona', e => zonaNombre(e.zonaId)], ['Sitio', e => e.sitio], ['Firma', e => e.firma], ['Estado', e => e.estado], ['Revisión', e => e.revision ? e.revision.estado : '']], S.d.ejecuciones.filter(e => e.estado !== 'borrador')));
+
+/* iniciar, asignar y plantillas */
+const zonasOpts = () => S.d.zonas.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0)).map(z => [z.id, z.nombre]);
+A.iniciar = d => {
+  if (!S.d.plantillas.length) return toast('Primero crea una plantilla de checklist.', 'bad');
+  modal(cabModal('Iniciar checklist') + `<div class="stack"><label class="fld"><span>Plantilla</span><select id="sPl">${opts(S.d.plantillas.map(p => [p.id, p.nombre]), d.id)}</select></label>
+    <div class="g2"><label class="fld"><span>Zona</span><select id="sZo">${opts(zonasOpts(), S.zona, 'Sin zona')}</select></label><label class="fld"><span>Sitio o cliente</span><input id="sSi" type="text" placeholder="Ej. Torre CAY-01"></label></div></div>
+    <div class="foot"><button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('empezar', 'Empezar')}</div>`);
+};
+A.empezar = () => { const pl = S.d.plantillas.find(p => p.id === val('sPl')); if (!pl) return; cerrar(); empezarRun(pl, { zonaId: val('sZo'), sitio: val('sSi') }); };
+A.iniciarAsig = d => {
+  const a = S.d.asignaciones.find(x => x.id === d.id), pl = a && S.d.plantillas.find(p => p.id === a.plantillaId);
+  if (!pl) return toast('La plantilla de este checklist ya no existe.', 'bad');
+  const b = S.d.ejecuciones.find(e => e.asignacionId === a.id && e.estado === 'borrador' && e.uid === S.me.id);
+  cerrar(); b ? A.continuar({ id: b.id }) : empezarRun(pl, { zonaId: a.zonaId, sitio: a.sitio, asignacionId: a.id });
+};
+A.continuar = d => { const e = S.d.ejecuciones.find(x => x.id === d.id); if (!e) return; S.run = { ...JSON.parse(JSON.stringify(e)), err: null }; S.view = 'ejecutar'; draw(); window.scrollTo(0, 0); };
+function empezarRun(pl, c) {
+  S.run = { id: '', plantillaId: pl.id, plantillaNombre: pl.nombre, items: pl.items, resp: {}, zonaId: c.zonaId || '', sitio: c.sitio || '', asignacionId: c.asignacionId || '', firma: S.me.name || '', nota: '', err: null };
+  S.view = 'ejecutar'; draw(); window.scrollTo(0, 0);
+}
+A.asignar = () => {
+  if (!S.d.plantillas.length) return toast('Primero crea una plantilla.', 'bad');
+  const f = new Date(); f.setDate(f.getDate() + 3);
+  modal(cabModal('Asignar checklist') + `<div class="stack"><label class="fld"><span>Plantilla</span><select id="aPl">${opts(S.d.plantillas.map(p => [p.id, p.nombre]))}</select></label>
+    <div class="g2"><label class="fld"><span>Zona</span><select id="aZo">${opts(zonasOpts(), S.zona, 'Sin zona')}</select></label><label class="fld"><span>Sitio</span><input id="aSi" type="text" placeholder="Ej. Nodo CCO-02"></label>
+    <label class="fld"><span>Vence el</span><input id="aVe" type="date" value="${isoDate(f)}"></label></div>
+    <label class="fld"><span>Nota para el técnico</span><textarea id="aNo" rows="2"></textarea></label></div>
+    <div class="foot"><button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('guardarAsig', 'Asignar')}</div>`);
+};
+A.guardarAsig = async () => {
+  const pl = S.d.plantillas.find(p => p.id === val('aPl')); if (!pl) return;
+  await hacer(async () => { await guardar('asignaciones', '', { plantillaId: pl.id, plantillaNombre: pl.nombre, zonaId: val('aZo'), sitio: val('aSi'), vence: val('aVe') || hoy(), nota: val('aNo'), ts: Date.now() }, 'Asignó checklist', pl.nombre); cerrar(); }, 'Checklist asignado.');
+};
+A.delAsig = d => hacer(() => borrar('asignaciones', d.id, 'Quitó asignación', ''), 'Asignación quitada.');
+function formPlantilla(p) {
+  p = p || {};
+  modal(cabModal(p.id ? 'Editar plantilla' : 'Nueva plantilla') + `<div class="stack"><label class="fld"><span>Nombre</span><input id="pNom" type="text" value="${esc(p.nombre || '')}"></label>
+    <label class="fld"><span>Tipo de trabajo</span><select id="pTip">${opts(TIPOS_CL, p.tipo)}</select></label>
+    <label class="fld"><span>Ítems, uno por línea</span><textarea id="pIts" rows="10" style="font-family:var(--font-mono);font-size:14px">${esc(itemsToText(p.items))}</textarea>
+    <small>Escribe <b>!</b> al inicio para marcar un ítem crítico. Para una medición usa <b>texto = unidad [mín..máx]</b>, por ejemplo <span class="mono">Potencia en ONT = dBm [-27..-8]</span>. Para enlazar un manual, termina la línea con <b>@</b> y parte de su título.</small></label></div>
+    <div class="foot">${p.id ? btn('delPlantilla', 'Eliminar', '', 'ghost', `data-id="${p.id}"`) : ''}<button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('guardarPlantilla', 'Guardar plantilla', '', '', `data-id="${p.id || ''}"`)}</div>`);
+}
+A.nuevaPlantilla = () => formPlantilla();
+A.editarPlantilla = d => formPlantilla(S.d.plantillas.find(p => p.id === d.id));
+A.guardarPlantilla = async d => {
+  const prev = S.d.plantillas.find(p => p.id === d.id), nombre = val('pNom'), items = textToItems(document.getElementById('pIts').value);
+  if (!nombre) return toast('Escribe el nombre de la plantilla.', 'bad');
+  if (!items.length) return toast('Agrega al menos un ítem.', 'bad');
+  const data = { nombre, tipo: val('pTip'), items }; if (prev && prev.ejemplo) data.ejemplo = true;
+  await hacer(async () => { await guardar('plantillas', d.id || '', JSON.parse(JSON.stringify(data)), prev ? 'Editó plantilla' : 'Creó plantilla', nombre); cerrar(); }, 'Plantilla guardada.');
+};
+A.delPlantilla = d => { const p = S.d.plantillas.find(x => x.id === d.id); if (p) preguntar('Eliminar plantilla', `Se elimina “${p.nombre}”. Los checklists ya hechos conservan su resultado.`, 'Eliminar', () => hacer(async () => { await borrar('plantillas', p.id, 'Eliminó plantilla', p.nombre); }, 'Plantilla eliminada.')); };
+
+/* ---------- ejecución en campo ---------- */
+function vEjecutar() {
+  const r = S.run; if (!r) { S.view = 'checklists'; return vChecklists(); }
+  const hechos = r.items.filter(i => respondido(i, r.resp[i.id])).length, crit = r.items.filter(i => i.critico && !respondido(i, r.resp[i.id])).length;
+  const itemHtml = i => {
+    const x = r.resp[i.id] || {}, fuera = i.unidad && enFuera(i, x.valor), fc = /^hilo/i.test(i.texto) ? FIBRA.find(f => norm(i.texto).includes(norm(f[0]))) : null;
+    const man = i.manualId && S.d.manuales.find(m => m.id === i.manualId);
+    const cuerpo = i.unidad
+      ? `<div class="med"><input id="v-${i.id}" type="number" step="any" inputmode="decimal" value="${esc(x.raw ?? '')}" data-i="medida" data-it="${i.id}" aria-label="Valor medido"><b>${esc(i.unidad)}</b>
+          ${rangoTxt(i) ? `<span class="sub" style="margin:0">Rango: ${rangoTxt(i)}</span>` : ''}${x.valor != null ? (fuera ? '<span class="chip bad">Fuera de rango</span>' : '<span class="chip ok">En rango</span>') : ''}</div>`
+      : `<div class="yn"><button class="y${x.ok === true ? ' on' : ''}" data-a="resp" data-it="${i.id}" data-v="1">Cumple</button><button class="n${x.ok === false ? ' on' : ''}" data-a="resp" data-it="${i.id}" data-v="0">No cumple</button></div>`;
+    const nota = x.nota || x.verNota || malo(i, x) ? `<textarea id="n-${i.id}" rows="2" placeholder="${malo(i, x) ? 'Nota obligatoria: qué pasó' : 'Nota'}" data-i="nota" data-it="${i.id}">${esc(x.nota || '')}</textarea>` : '';
+    return `<div class="it ${malo(i, x) ? 'no' : respondido(i, x) ? 'good' : ''}"><div class="q">${fc ? `<span class="dot" style="background:${fc[1]}"></span>` : ''}<span>${esc(i.texto)}</span>${i.critico ? '<span class="chip acc">Crítico</span>' : ''}</div>
+      ${cuerpo}${nota}
+      <div class="thumbs">${(x.fotos || []).map(f => `<div><img src="/_blob/${f}" alt="Foto del ítem"><button data-a="quitarFoto" data-it="${i.id}" data-f="${f}" aria-label="Quitar foto">${ic('x')}</button></div>`).join('')}</div>
+      <div class="acts">${!nota ? `<button class="btn ghost sm" data-a="verNota" data-it="${i.id}">Agregar nota</button>` : ''}
+        ${S.caps.upload && (x.fotos || []).length < 3 ? `<label class="btn ghost sm">${ic('cam')}Foto<input type="file" accept="image/*" capture="environment" hidden data-c="foto" data-it="${i.id}"></label>` : ''}
+        ${man ? `<button class="btn ghost sm" data-a="verManual" data-id="${man.id}">${ic('book')}Ver manual</button>` : ''}</div></div>`;
+  };
+  return cab(r.plantillaNombre, `${esc(r.sitio || 'Sin sitio')} · ${esc(zonaNombre(r.zonaId))}`, btn('salirRun', 'Salir', 'back', 'ghost')) +
+    `<div class="stack" style="margin-bottom:14px"><div class="prog"><i style="width:${Math.round(100 * hechos / Math.max(1, r.items.length))}%"></i></div>
+      <span class="sub" style="margin:0">${hechos} de ${r.items.length} ítems completos${crit ? ` · <b>${crit} crítico${crit > 1 ? 's' : ''} pendiente${crit > 1 ? 's' : ''}</b>` : ''}</span></div>` +
+    (r.err ? `<div class="note" style="border-color:var(--bad);background:var(--bad-soft)"><div>${r.err.map(e => `<div>${esc(e)}</div>`).join('')}</div></div>` : '') +
+    `<div class="stack">${r.items.map(itemHtml).join('')}
+    <label class="fld"><span>Sitio o cliente</span><input id="r-sitio" type="text" value="${esc(r.sitio)}" data-i="sitioRun"></label>
+    <label class="fld"><span>Observaciones generales</span><textarea id="r-nota" rows="2" data-i="notaRun">${esc(r.nota)}</textarea></label>
+    <label class="fld"><span>Firma: escribe tu nombre</span><input id="r-firma" type="text" value="${esc(r.firma)}" data-i="firmaRun"></label>
+    <div class="acts">${btn('completar', 'Completar checklist', 'check')}${btn('borrador', 'Guardar borrador', '', 'ghost')}</div></div>`;
+}
+const respDe = id => (S.run.resp[id] = S.run.resp[id] || {});
+A.resp = d => { respDe(d.it).ok = d.v === '1'; draw(); };
+A.verNota = d => { respDe(d.it).verNota = true; draw(); const n = document.getElementById('n-' + d.it); if (n) n.focus(); };
+I.medida = t => { const x = respDe(t.dataset.it); x.raw = t.value; x.valor = t.value === '' || isNaN(t.valueAsNumber) ? null : t.valueAsNumber; draw(); };
+I.nota = t => { respDe(t.dataset.it).nota = t.value; };
+I.sitioRun = t => { S.run.sitio = t.value; };
+I.notaRun = t => { S.run.nota = t.value; };
+I.firmaRun = t => { S.run.firma = t.value; };
+I.zona = t => { S.zona = t.value; draw(); };
+A.salirRun = () => preguntar('Salir del checklist', 'Si sales sin guardar un borrador, pierdes lo que llenaste.', 'Salir', () => { S.run = null; ir('checklists'); });
+A.quitarFoto = d => { const x = respDe(d.it); x.fotos = (x.fotos || []).filter(f => f !== d.f); draw(); };
+async function comprimir(file) {
+  try {
+    const b = await createImageBitmap(file), k = Math.min(1, 1280 / Math.max(b.width, b.height)), cv = document.createElement('canvas');
+    cv.width = Math.round(b.width * k); cv.height = Math.round(b.height * k); cv.getContext('2d').drawImage(b, 0, 0, cv.width, cv.height);
+    return await new Promise(r => cv.toBlob(r, 'image/jpeg', .8));
+  } catch (_) { return null; }
+}
+C.foto = async t => {
+  const f = t.files[0]; if (!f) return; toast('Subiendo foto…');
+  const blob = await comprimir(f), r = blob ? await subir(blob, 'image/jpeg') : await subir(f);
+  if (r) { const x = respDe(t.dataset.it); x.fotos = [...(x.fotos || []), r.id]; draw(); toast('Foto agregada.'); }
+};
+async function guardarRun(estado) {
+  const r = S.run, sinResponder = r.items.filter(i => !respondido(i, r.resp[i.id])).length;
+  const resp = JSON.parse(JSON.stringify(r.resp)); Object.values(resp).forEach(x => delete x.verNota);
+  const data = JSON.parse(JSON.stringify({ plantillaId: r.plantillaId, plantillaNombre: r.plantillaNombre, items: r.items, resp, zonaId: r.zonaId, sitio: r.sitio, asignacionId: r.asignacionId, uid: S.me.id, firma: r.firma.trim(), nota: r.nota, ts: Date.now(), estado, sinResponder }));
+  return hacer(async () => { r.id = await guardar('ejecuciones', r.id, data, estado === 'borrador' ? 'Guardó borrador' : 'Completó checklist', `${r.plantillaNombre} · ${r.sitio || zonaNombre(r.zonaId)}`); }, null);
+}
+A.borrador = async () => { if (await guardarRun('borrador')) { toast('Borrador guardado.'); S.run = null; ir('checklists'); } };
+A.completar = async () => {
+  const r = S.run, falta = [];
+  r.items.forEach(i => { const x = r.resp[i.id] || {};
+    if (i.critico && !respondido(i, x)) falta.push(`Falta el ítem crítico: ${i.texto}`);
+    if (malo(i, x) && !(x.nota || '').trim()) falta.push(`Explica en una nota: ${i.texto}`); });
+  if (!r.firma.trim()) falta.push('Escribe tu nombre como firma.');
+  r.err = falta.length ? falta : null;
+  if (falta.length) { draw(); window.scrollTo(0, 0); return; }
+  const obs = r.items.some(i => malo(i, r.resp[i.id])), estado = obs ? 'observaciones' : 'completo';
+  if (await guardarRun(estado)) { toast(obs ? 'Checklist guardado con observaciones.' : 'Checklist completo.'); S.run = null; S.f = { tab: 'hist' }; ir('checklists'); S.f = { tab: 'hist' }; draw(); }
+};
+
+/* ---------- detalle e informe ---------- */
+function informe(e) {
+  const filas = e.items.map(i => { const x = (e.resp || {})[i.id] || {};
+    const r = i.unidad ? (x.valor != null ? `${x.valor} ${i.unidad}${enFuera(i, x.valor) ? ' (fuera de rango)' : ''}` : 'Sin medir') : x.ok === true ? 'Cumple' : x.ok === false ? 'No cumple' : 'Sin responder';
+    return `<tr><td>${esc(i.texto)}${i.critico ? ' <b>(crítico)</b>' : ''}</td><td>${esc(r)}</td><td>${esc(x.nota || '')}</td></tr>`; }).join('');
+  return `<!doctype html><html lang="es"><meta charset="utf-8"><title>Informe de checklist</title><style>body{font:15px/1.4 system-ui,sans-serif;margin:32px;color:#111}table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:6px 8px;text-align:left;vertical-align:top}h1{margin:0 0 4px}</style>
+<h1>${esc(e.plantillaNombre)}</h1><p>${esc(e.sitio || zonaNombre(e.zonaId))} · ${fHora(e.ts)} · Firma: ${esc(e.firma)} · Estado: ${esc(e.estado)}</p>
+<table><tr><th>Ítem</th><th>Resultado</th><th>Nota</th></tr>${filas}</table>${e.nota ? `<p><b>Observaciones:</b> ${esc(e.nota)}</p>` : ''}${e.revision ? `<p><b>Revisión del supervisor:</b> ${esc(e.revision.estado)}. ${esc(e.revision.nota || '')}</p>` : ''}</html>`;
+}
+A.verRun = async d => {
+  const e = S.d.ejecuciones.find(x => x.id === d.id); if (!e) return;
+  if (e.revision) await resolver([e.revision.uid]);
+  const lineas = e.items.map(i => { const x = (e.resp || {})[i.id] || {};
+    const res = i.unidad ? (x.valor != null ? `<b class="mono">${num(x.valor, 3)} ${esc(i.unidad)}</b> ${enFuera(i, x.valor) ? '<span class="chip bad">Fuera de rango</span>' : '<span class="chip ok">En rango</span>'}` : '<span class="chip">Sin medir</span>')
+      : x.ok === true ? '<span class="chip ok">Cumple</span>' : x.ok === false ? '<span class="chip bad">No cumple</span>' : '<span class="chip">Sin responder</span>';
+    return `<div class="row"><div class="main"><div class="t">${esc(i.texto)}${i.critico ? ' <span class="chip acc">Crítico</span>' : ''}</div>${x.nota ? `<div class="m"><span>${esc(x.nota)}</span></div>` : ''}
+      ${(x.fotos || []).length ? `<div class="thumbs" style="margin-top:6px">${x.fotos.map(f => `<a href="/_blob/${f}" target="_blank" rel="noopener"><img src="/_blob/${f}" alt="Foto"></a>`).join('')}</div>` : ''}</div><div class="side">${res}</div></div>`; }).join('');
+  modal(cabModal(e.plantillaNombre) + `<div class="acts">${chipEstado(e)}<span class="chip">${esc(e.sitio || zonaNombre(e.zonaId))}</span><span class="chip">${esc(zonaNombre(e.zonaId))}</span><span class="chip">${esc(e.firma)}</span><span class="chip">${fHora(e.ts)}</span></div>
+    ${e.nota ? `<p>${esc(e.nota)}</p>` : ''}<div class="rows">${lineas}</div>
+    ${e.revision ? `<p class="sub">Revisión: <b>${esc(e.revision.estado)}</b> por ${esc(nombreDe(e.revision.uid))}. ${esc(e.revision.nota || '')}</p>` : ''}
+    ${esAdmin() && !e.revision ? `<label class="fld"><span>Nota de revisión</span><textarea id="rvNota" rows="2"></textarea></label>` : ''}
+    <div class="foot">${S.caps.save ? btn('informe', 'Descargar informe', 'down', 'ghost', `data-id="${e.id}"`) : ''}
+    ${esAdmin() && !e.revision ? btn('revisar', 'Rechazar', '', 'ghost', `data-id="${e.id}" data-v="rechazado"`) + btn('revisar', 'Aprobar', '', '', `data-id="${e.id}" data-v="aprobado"`) : ''}</div>`);
+};
+A.informe = d => { const e = S.d.ejecuciones.find(x => x.id === d.id); if (e) descargar(`checklist-${norm(e.plantillaNombre).replace(/\W+/g, '-')}-${isoDate(new Date(e.ts))}.html`, informe(e)); };
+A.revisar = d => { const e = S.d.ejecuciones.find(x => x.id === d.id); if (!e) return;
+  hacer(async () => { await parchar('ejecuciones', e.id, { revision: { estado: d.v, nota: val('rvNota'), uid: S.me.id, ts: Date.now() }, ...(d.v === 'rechazado' ? { estado: 'rechazado' } : {}) }, d.v === 'aprobado' ? 'Aprobó checklist' : 'Rechazó checklist', e.plantillaNombre); cerrar(); }, 'Revisión guardada.'); };
+
+/* ---------- inventario ---------- */
+function vInventario() {
+  const tab = S.f.tab || 'stock';
+  const tabs = `<div class="tabs">${[['stock', 'Existencias'], ['mov', 'Movimientos']].map(([k, t]) => `<button class="${tab === k ? 'on' : ''}" data-a="tab" data-t="${k}">${t}</button>`).join('')}</div>`;
+  const acts = (esAdmin() ? btn('nuevoItem', 'Nuevo ítem', 'plus') + btn('zonas', 'Zonas', '', 'ghost') : '') + (S.caps.save ? btn('csvInv', 'Exportar CSV', 'down', 'ghost') : '');
+  const q = norm(S.f.q), c = S.f.cat || '', es = S.f.est || '';
+  const base = S.d.inventario.filter(i => enZona(i) && (!c || i.categoria === c) && (!es || i.estado === es) && (!q || norm(i.nombre + ' ' + (i.codigo || '')).includes(q)));
+  const bajos = base.filter(i => i.minimo > 0 && i.cantidad <= i.minimo && i.estado !== 'baja').length;
+  const strip = `<div class="strip"><div><div class="k">${base.length}</div><div class="kl">Ítems</div></div><div><div class="k">${bajos}</div><div class="kl">Bajo el mínimo</div></div><div><div class="k">${base.filter(i => i.estado === 'en reparación').length}</div><div class="kl">En reparación</div></div></div>`;
+  let cuerpo;
+  if (tab === 'mov') {
+    const ms = S.d.movimientos.filter(m => !S.zona || m.deZona === S.zona || m.aZona === S.zona).slice(0, 100);
+    quiero(ms.map(m => m.uid));
+    cuerpo = ms.length ? `<div class="rows">${ms.map(m => `<div class="row"><div class="main"><div class="t">${esc(m.invNombre)}</div><div class="m"><span>${esc(m.tipo)}${m.tipo === 'transferencia' ? `: ${esc(zonaNombre(m.deZona))} → ${esc(zonaNombre(m.aZona))}` : ` · ${esc(zonaNombre(m.deZona))}`}</span><span>${esc(m.motivo || '')}</span><span>${esc(nombreDe(m.uid))} · ${fHora(m.ts)}</span></div></div>
+      <div class="side"><span class="chip ${m.tipo === 'entrada' ? 'ok' : m.tipo === 'salida' ? 'warn' : ''}">${m.tipo === 'entrada' ? '+' : m.tipo === 'salida' ? '−' : ''}${num(m.cant, 2)} ${esc(m.unidad || '')}</span></div></div>`).join('')}</div>` : vacio('Sin movimientos', 'Las entradas, salidas y transferencias quedan registradas aquí.');
+  } else {
+    const cons = !S.zona && S.f.det !== '1';
+    let filas;
+    if (cons) {
+      const g = {};
+      base.forEach(i => { const k = norm(i.nombre); const o = g[k] = g[k] || { nombre: i.nombre, unidad: i.unidad, cat: i.categoria, total: 0, z: {}, bajo: false }; o.total += i.cantidad; o.z[i.zonaId] = (o.z[i.zonaId] || 0) + i.cantidad; if (i.minimo > 0 && i.cantidad <= i.minimo) o.bajo = true; });
+      filas = Object.values(g).sort((a, b) => norm(a.nombre) < norm(b.nombre) ? -1 : 1).map(o => `<div class="row${o.bajo ? ' sev-warn' : ''}"><div class="main"><div class="t">${esc(o.nombre)}</div><div class="m"><span>${esc(o.cat)}</span>${Object.entries(o.z).map(([z, n]) => `<span>${esc(zonaNombre(z))}: <b class="mono">${num(n)}</b></span>`).join('')}</div></div>
+        <div class="side">${o.bajo ? '<span class="chip warn">Bajo mínimo en una zona</span>' : ''}<div class="qty">${num(o.total, 2)}<small>${esc(o.unidad || '')}</small></div></div></div>`).join('');
+    } else {
+      filas = base.slice().sort((a, b) => norm(a.nombre) < norm(b.nombre) ? -1 : 1).map(i => {
+        const bajo = i.minimo > 0 && i.cantidad <= i.minimo && i.estado !== 'baja';
+        return `<div class="row${bajo ? ' sev-warn' : ''}"><div class="main"><div class="t">${esc(i.nombre)}</div><div class="m">${i.codigo ? `<span class="mono">${esc(i.codigo)}</span>` : ''}<span>${esc(i.categoria)}</span><span>${esc(zonaNombre(i.zonaId))}</span>${i.responsable ? `<span>Resp.: ${esc(i.responsable)}</span>` : ''}</div></div>
+        <div class="side">${bajo ? '<span class="chip warn">Bajo mínimo</span>' : ''}<span class="chip ${i.estado === 'baja' ? 'bad' : i.estado === 'en reparación' ? 'warn' : ''}">${esc(i.estado)}</span><div class="qty">${num(i.cantidad, 2)}<small>${esc(i.unidad || '')}</small></div>
+        ${puede() ? btn('mover', 'Mover', 'swap', 'ghost sm', `data-id="${i.id}"`) : ''}${esAdmin() ? btn('editarItem', 'Editar', '', 'ghost sm', `data-id="${i.id}"`) : ''}</div></div>`;
+      }).join('');
+    }
+    cuerpo = `<div class="bar"><input id="qInv" type="search" placeholder="Buscar por nombre o serie" value="${esc(S.f.q || '')}" data-i="q"><select id="cInv" data-i="cat">${opts(CAT_INV, c, 'Todas las categorías')}</select><select id="eInv" data-i="est">${opts(EST_INV, es, 'Todos los estados')}</select>
+      ${!S.zona ? btn('detalle', cons ? 'Ver detalle por zona' : 'Ver consolidado', '', 'ghost') : ''}</div>` +
+      (filas ? `<div class="rows">${filas}</div>` : vacio('No hay ítems', S.d.inventario.length ? 'Prueba con otro filtro.' : 'Un supervisor puede registrar el primer ítem.'));
+  }
+  return cab('Inventario', S.zona ? `Zona: ${esc(zonaNombre(S.zona))}` : 'Consolidado de todas las zonas', acts) + strip + tabs + cuerpo;
+}
+A.detalle = () => { S.f.det = S.f.det === '1' ? '' : '1'; draw(); };
+A.csvInv = () => descargar('inventario.csv', toCsv([['Ítem', i => i.nombre], ['Categoría', i => i.categoria], ['Código o serie', i => i.codigo], ['Cantidad', i => i.cantidad], ['Unidad', i => i.unidad], ['Estado', i => i.estado], ['Zona', i => zonaNombre(i.zonaId)], ['Responsable', i => i.responsable], ['Mínimo', i => i.minimo]], S.d.inventario.filter(enZona)));
+function formItem(i) {
+  i = i || {};
+  modal(cabModal(i.id ? 'Editar ítem' : 'Nuevo ítem') + `<div class="stack"><label class="fld"><span>Nombre</span><input id="iNom" type="text" value="${esc(i.nombre || '')}"></label>
+    <div class="g2"><label class="fld"><span>Categoría</span><select id="iCat">${opts(CAT_INV, i.categoria)}</select></label><label class="fld"><span>Código o serie</span><input id="iCod" type="text" value="${esc(i.codigo || '')}"></label>
+    <label class="fld"><span>Cantidad</span><input id="iCan" type="number" step="any" value="${i.cantidad ?? 1}"></label><label class="fld"><span>Unidad</span><input id="iUni" type="text" placeholder="u, m, rollo" value="${esc(i.unidad || 'u')}"></label>
+    <label class="fld"><span>Estado</span><select id="iEst">${opts(EST_INV, i.estado || 'nuevo')}</select></label><label class="fld"><span>Zona</span><select id="iZon">${opts(zonasOpts(), i.zonaId || S.zona)}</select></label>
+    <label class="fld"><span>Responsable</span><input id="iRes" type="text" value="${esc(i.responsable || '')}"></label><label class="fld"><span>Stock mínimo</span><input id="iMin" type="number" step="any" value="${i.minimo ?? 0}"></label></div></div>
+    <div class="foot">${i.id ? btn('delItem', 'Eliminar', '', 'ghost', `data-id="${i.id}"`) : ''}<button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('guardarItem', 'Guardar ítem', '', '', `data-id="${i.id || ''}"`)}</div>`);
+}
+A.nuevoItem = () => { if (!S.d.zonas.length) return toast('Primero crea una zona.', 'bad'); formItem(); };
+A.editarItem = d => formItem(S.d.inventario.find(i => i.id === d.id));
+A.guardarItem = async d => {
+  const prev = S.d.inventario.find(i => i.id === d.id), nombre = val('iNom'), cant = parseFloat(val('iCan'));
+  if (!nombre) return toast('Escribe el nombre del ítem.', 'bad');
+  if (isNaN(cant) || cant < 0) return toast('La cantidad debe ser un número mayor o igual a 0.', 'bad');
+  const data = { nombre, categoria: val('iCat'), codigo: val('iCod'), cantidad: cant, unidad: val('iUni') || 'u', estado: val('iEst'), zonaId: val('iZon'), responsable: val('iRes'), minimo: parseFloat(val('iMin')) || 0 };
+  if (prev && prev.ejemplo) data.ejemplo = true;
+  await hacer(async () => { await guardar('inventario', d.id || '', data, prev ? 'Editó ítem' : 'Creó ítem', nombre); cerrar(); }, 'Ítem guardado.');
+};
+A.delItem = d => { const i = S.d.inventario.find(x => x.id === d.id); if (i) preguntar('Eliminar ítem', `Se elimina “${i.nombre}” del inventario de ${zonaNombre(i.zonaId)}.`, 'Eliminar', () => hacer(async () => { await borrar('inventario', i.id, 'Eliminó ítem', i.nombre); }, 'Ítem eliminado.')); };
+A.mover = d => {
+  const i = S.d.inventario.find(x => x.id === d.id); if (!i) return;
+  modal(cabModal('Mover: ' + i.nombre) + `<p class="sub">En ${esc(zonaNombre(i.zonaId))} hay <b class="mono">${num(i.cantidad, 2)}</b> ${esc(i.unidad || '')}.</p>
+    <div class="stack"><div class="g2"><label class="fld"><span>Tipo</span><select id="mvTipo">${opts([['salida', 'Salida (uso o consumo)'], ['entrada', 'Entrada (compra o devolución)'], ['transferencia', 'Transferencia a otra zona']])}</select></label>
+    <label class="fld"><span>Cantidad</span><input id="mvCan" type="number" step="any" value="1"></label></div>
+    <label class="fld"><span>Zona de destino (solo transferencia)</span><select id="mvDes">${opts(zonasOpts().filter(z => z[0] !== i.zonaId), '', 'Elegir zona')}</select></label>
+    <label class="fld"><span>Motivo</span><input id="mvMot" type="text" placeholder="Ej. Instalación cliente, reposición de almacén"></label></div>
+    <div class="foot"><button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('hacerMov', 'Registrar movimiento', '', '', `data-id="${i.id}"`)}</div>`);
+};
+A.hacerMov = async d => {
+  const it = S.d.inventario.find(x => x.id === d.id); if (!it) return;
+  const tipo = val('mvTipo'), n = parseFloat(val('mvCan')), des = val('mvDes'), motivo = val('mvMot');
+  if (!(n > 0)) return toast('Escribe una cantidad mayor a 0.', 'bad');
+  if (tipo !== 'entrada' && n > it.cantidad) return toast('No hay tanta cantidad en esta zona.', 'bad');
+  if (tipo !== 'entrada' && !motivo) return toast('Escribe el motivo del movimiento.', 'bad');
+  if (tipo === 'transferencia' && !des) return toast('Elige la zona de destino.', 'bad');
+  await hacer(async () => {
+    if (tipo === 'entrada') await parchar('inventario', it.id, { cantidad: it.cantidad + n }, 'Entrada de inventario', `${it.nombre} +${n}`);
+    else if (tipo === 'salida') await parchar('inventario', it.id, { cantidad: it.cantidad - n }, 'Salida de inventario', `${it.nombre} −${n}`);
+    else {
+      const dest = S.d.inventario.find(x => x.zonaId === des && norm(x.nombre) === norm(it.nombre) && (x.codigo || '') === (it.codigo || ''));
+      if (n === it.cantidad && !dest) await parchar('inventario', it.id, { zonaId: des }, 'Transferencia', `${it.nombre} → ${zonaNombre(des)}`);
+      else {
+        await parchar('inventario', it.id, { cantidad: it.cantidad - n }, 'Transferencia', `${it.nombre} ×${n} → ${zonaNombre(des)}`);
+        if (dest) await parchar('inventario', dest.id, { cantidad: dest.cantidad + n }, 'Recepción de transferencia', it.nombre);
+        else { const c = { nombre: it.nombre, categoria: it.categoria, codigo: it.codigo || '', cantidad: n, unidad: it.unidad, estado: it.estado, zonaId: des, responsable: '', minimo: it.minimo || 0 }; if (it.ejemplo) c.ejemplo = true; await guardar('inventario', '', c, 'Creó ítem por transferencia', it.nombre); }
+      }
+    }
+    const mv = { invId: it.id, invNombre: it.nombre, tipo, cant: n, unidad: it.unidad || '', deZona: it.zonaId, aZona: tipo === 'transferencia' ? des : '', motivo, uid: S.me.id, ts: Date.now() };
+    if (it.ejemplo) mv.ejemplo = true;
+    await col('movimientos').add(mv); cerrar();
+  }, 'Movimiento registrado.');
+};
+A.zonas = () => {
+  const zs = S.d.zonas.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0));
+  modal(cabModal('Zonas y almacenes') + `<div class="rows">${zs.map(z => `<div class="row"><div class="main"><div class="t">${esc(z.nombre)}</div><div class="m"><span>${esc(z.tipo || 'Zona')}</span></div></div><div class="side">${btn('delZona', 'Quitar', '', 'ghost sm', `data-id="${z.id}"`)}</div></div>`).join('') || '<div class="row">Aún no hay zonas.</div>'}</div>
+    <div class="g2"><label class="fld"><span>Nombre</span><input id="zNom" type="text" placeholder="Ej. Zona Sur · Socabaya"></label><label class="fld"><span>Tipo</span><select id="zTip">${opts(['Zona', 'Sitio', 'Almacén'])}</select></label></div>
+    <div class="foot"><button class="btn ghost" data-a="cerrar">Cerrar</button>${btn('addZona', 'Agregar zona', 'plus')}</div>`);
+};
+A.addZona = async () => { const n = val('zNom'); if (!n) return toast('Escribe el nombre de la zona.', 'bad'); if (await hacer(() => guardar('zonas', '', { nombre: n, tipo: val('zTip'), orden: S.d.zonas.length }, 'Creó zona', n), 'Zona agregada.')) setTimeout(A.zonas, 350); };
+A.delZona = d => { const z = S.d.zonas.find(x => x.id === d.id); if (!z) return;
+  if (S.d.inventario.some(i => i.zonaId === z.id) || S.d.personal.some(p => p.zonaId === z.id)) return toast('Esta zona tiene inventario o personal. Muévelos antes de quitarla.', 'bad');
+  hacer(async () => { await borrar('zonas', z.id, 'Eliminó zona', z.nombre); if (S.zona === z.id) S.zona = ''; setTimeout(A.zonas, 350); }, 'Zona quitada.'); };
+
+/* ---------- personal ---------- */
+const parseCerts = t => t.split('\n').map(l => l.split('|').map(s => s.trim())).filter(a => a[0]).map(a => ({ nombre: a[0], vence: /^\d{4}-\d{2}-\d{2}$/.test(a[1] || '') ? a[1] : '' }));
+const certChip = c => { if (!c.vence) return '<span class="chip">Sin fecha</span>'; const d = diasHasta(c.vence); return d < 0 ? '<span class="chip bad">Vencida</span>' : d <= 30 ? `<span class="chip warn">Vence en ${d} d</span>` : '<span class="chip ok">Vigente</span>'; };
+function vPersonal() {
+  const q = norm(S.f.q);
+  const ls = S.d.personal.filter(p => enZona(p) && (!q || norm(p.nombre + ' ' + p.cargo).includes(q))).sort((a, b) => norm(a.nombre) < norm(b.nombre) ? -1 : 1);
+  const filas = ls.map(p => { const peor = (p.certs || []).map(c => c.vence ? diasHasta(c.vence) : 999).sort((a, b) => a - b)[0];
+    return `<div class="row click${peor < 0 ? ' sev-bad' : peor <= 30 ? ' sev-warn' : ''}" data-a="verPersona" data-id="${p.id}"><div class="main"><div class="t">${esc(p.nombre)}</div><div class="m"><span>${esc(p.cargo)}</span><span>${esc(zonaNombre(p.zonaId))}</span></div></div>
+    <div class="side">${peor < 0 ? '<span class="chip bad">Certificación vencida</span>' : peor <= 30 ? '<span class="chip warn">Certificación por vencer</span>' : ''}</div></div>`; }).join('');
+  return cab('Personal', 'Fichas, certificaciones, equipos asignados y turnos.', (esAdmin() ? btn('nuevaPersona', 'Nueva ficha', 'plus') : '') + (S.caps.save ? btn('csvPer', 'Exportar CSV', 'down', 'ghost') : '')) +
+    `<div class="bar"><input id="qPer" type="search" placeholder="Buscar por nombre o cargo" value="${esc(S.f.q || '')}" data-i="q"></div>` +
+    (ls.length ? `<div class="rows">${filas}</div>` : vacio('No hay fichas', S.d.personal.length ? 'Prueba con otra búsqueda o zona.' : 'Un supervisor puede crear la primera ficha.'));
+}
+A.csvPer = () => descargar('personal.csv', toCsv([['Nombre', p => p.nombre], ['Cargo', p => p.cargo], ['Zona', p => zonaNombre(p.zonaId)], ['Teléfono', p => p.telefono], ['Ingreso', p => p.ingreso], ['Certificaciones', p => (p.certs || []).map(c => `${c.nombre} (${c.vence || 's/f'})`).join('; ')], ['Equipos', p => (p.equipos || []).join('; ')]], S.d.personal.filter(enZona)));
+A.verPersona = d => {
+  const p = S.d.personal.find(x => x.id === d.id); if (!p) return;
+  const hechos = S.d.ejecuciones.filter(e => e.estado !== 'borrador' && ((p.uid && e.uid === p.uid) || norm(e.firma) === norm(p.nombre)));
+  const obl = S.d.manuales.filter(m => m.obligatorio), leidos = p.uid ? obl.filter(m => S.d.lecturas.some(l => l.uid === p.uid && l.manualId === m.id && l.version === m.version)).length : null;
+  modal(cabModal(p.nombre) + `<dl class="kv"><dt>Cargo</dt><dd>${esc(p.cargo)}</dd><dt>Zona</dt><dd>${esc(zonaNombre(p.zonaId))}</dd><dt>Teléfono</dt><dd class="mono">${esc(p.telefono || '—')}</dd><dt>Ingreso</dt><dd>${fFecha(p.ingreso)}</dd>
+    <dt>Checklists</dt><dd>${hechos.length} realizados</dd><dt>Manuales</dt><dd>${leidos === null ? 'Sin cuenta vinculada' : `${leidos} de ${obl.length} obligatorios leídos`}</dd></dl>
+    <div class="stack"><b>Certificaciones</b>${(p.certs || []).length ? `<div class="rows">${p.certs.map(c => `<div class="row"><div class="main"><div class="t">${esc(c.nombre)}</div><div class="m"><span>Vence ${fFecha(c.vence)}</span></div></div><div class="side">${certChip(c)}</div></div>`).join('')}</div>` : '<p class="sub">Sin certificaciones registradas.</p>'}</div>
+    <div class="stack"><b>Equipos y herramientas asignados</b><p class="sub">${(p.equipos || []).length ? p.equipos.map(esc).join(' · ') : 'Ninguno.'}</p></div>
+    <div class="stack"><b>Turnos de la semana</b><div class="turnos">${(p.turnos || []).map((t, n) => `<div class="tu ${t}"><span>${DIAS[n]}</span><b>${t}</b></div>`).join('')}</div><small class="sub">M mañana · T tarde · N noche · L libre</small></div>
+    <div class="foot">${esAdmin() ? btn('editarPersona', 'Editar ficha', '', 'ghost', `data-id="${p.id}"`) : ''}</div>`);
+};
+function formPersona(p) {
+  p = p || {};
+  const tu = p.turnos || ['M', 'M', 'M', 'M', 'M', 'L', 'L'];
+  modal(cabModal(p.id ? 'Editar ficha' : 'Nueva ficha') + `<div class="stack"><label class="fld"><span>Nombre completo</span><input id="pNomb" type="text" value="${esc(p.nombre || '')}"></label>
+    <div class="g2"><label class="fld"><span>Cargo</span><input id="pCar" type="text" value="${esc(p.cargo || '')}"></label><label class="fld"><span>Zona</span><select id="pZon">${opts(zonasOpts(), p.zonaId || S.zona, 'Sin zona')}</select></label>
+    <label class="fld"><span>Teléfono</span><input id="pTel" type="text" value="${esc(p.telefono || '')}"></label><label class="fld"><span>Fecha de ingreso</span><input id="pIng" type="date" value="${esc(p.ingreso || '')}"></label></div>
+    <label class="fld"><span>Certificaciones, una por línea</span><textarea id="pCer" rows="3" placeholder="Trabajo en altura | 2027-03-15">${esc((p.certs || []).map(c => `${c.nombre} | ${c.vence}`).join('\n'))}</textarea></label>
+    <label class="fld"><span>Equipos y herramientas, uno por línea</span><textarea id="pEqu" rows="3">${esc((p.equipos || []).join('\n'))}</textarea></label>
+    <div class="fld"><span>Turnos (lunes a domingo)</span><div class="turnos">${tu.map((t, n) => `<select id="pTu${n}" aria-label="${DIAS[n]}" style="padding:4px;min-height:40px">${opts(Object.keys(TURNOS), t)}</select>`).join('')}</div></div>
+    ${S.me.id ? `<label class="chk"><input id="pUid" type="checkbox" ${p.uid === S.me.id ? 'checked' : ''}>Esta ficha es mía (vincula mi cuenta)</label>` : ''}</div>
+    <div class="foot">${p.id ? btn('delPersona', 'Eliminar', '', 'ghost', `data-id="${p.id}"`) : ''}<button class="btn ghost" data-a="cerrar">Cancelar</button>${btn('guardarPersona', 'Guardar ficha', '', '', `data-id="${p.id || ''}"`)}</div>`);
+}
+A.nuevaPersona = () => formPersona();
+A.editarPersona = d => formPersona(S.d.personal.find(p => p.id === d.id));
+A.guardarPersona = async d => {
+  const prev = S.d.personal.find(p => p.id === d.id), nombre = val('pNomb');
+  if (!nombre) return toast('Escribe el nombre de la persona.', 'bad');
+  const data = { nombre, cargo: val('pCar'), zonaId: val('pZon'), telefono: val('pTel'), ingreso: val('pIng'), certs: parseCerts(val('pCer')), equipos: val('pEqu').split('\n').map(s => s.trim()).filter(Boolean), turnos: [0, 1, 2, 3, 4, 5, 6].map(n => val('pTu' + n) || 'L'), uid: chk('pUid') ? S.me.id : (prev && prev.uid && prev.uid !== S.me.id ? prev.uid : null) };
+  if (prev && prev.ejemplo) data.ejemplo = true;
+  await hacer(async () => { await guardar('personal', d.id || '', data, prev ? 'Editó ficha' : 'Creó ficha', nombre); cerrar(); }, 'Ficha guardada.');
+};
+A.delPersona = d => { const p = S.d.personal.find(x => x.id === d.id); if (p) preguntar('Eliminar ficha', `Se elimina la ficha de ${p.nombre}.`, 'Eliminar', () => hacer(async () => { await borrar('personal', p.id, 'Eliminó ficha', p.nombre); }, 'Ficha eliminada.')); };
+
+/* ---------- registro de actividad ---------- */
+function vAuditoria() {
+  quiero(S.d.auditoria.map(a => a.uid));
+  return cab('Registro de actividad', 'Quién cambió qué y cuándo. Se muestran los últimos 150 movimientos.', esAdmin() ? btn('purgar', 'Borrar registros de más de 90 días', '', 'ghost') : '') +
+    (S.d.auditoria.length ? `<div class="rows">${S.d.auditoria.map(a => `<div class="row"><div class="main"><div class="t">${esc(a.accion)}</div><div class="m"><span>${esc(a.detalle)}</span></div></div><div class="side"><span class="m">${esc(nombreDe(a.uid))} · ${fHora(a.ts)}</span></div></div>`).join('')}</div>` : vacio('Sin actividad todavía', 'Cada cambio quedará anotado aquí.'));
+}
+A.purgar = () => preguntar('Borrar registros antiguos', 'Se eliminan los registros de actividad con más de 90 días.', 'Borrar', () => hacer(async () => {
+  const sn = await col('auditoria').where('ts', '<', Date.now() - 90 * 864e5).limit(500).get();
+  for (const d of sn.docs) await col('auditoria').doc(d.id).delete();
+  toast(`${sn.size} registros borrados.`);
+}, null));
+
+/* ---------- eventos y arranque ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if (!b || b.disabled) return;
+  const f = A[b.dataset.a]; if (f) f(b.dataset, b);
+});
+document.addEventListener('input', e => {
+  const t = e.target, k = t.dataset && t.dataset.i; if (!k) return;
+  if (I[k]) I[k](t, e); else { S.f[k] = t.value; draw(); }
+});
+document.addEventListener('change', e => { const t = e.target, k = t.dataset && t.dataset.c; if (k && C[k]) C[k](t, e); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) cerrar(); });
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') cerrar(); });
+
+const LIM = { ejecuciones: q => q.orderBy('ts', 'desc').limit(400), movimientos: q => q.orderBy('ts', 'desc').limit(300), auditoria: q => q.orderBy('ts', 'desc').limit(150) };
+function suscribir() {
+  Object.keys(S.d).forEach(c => {
+    let q = col(c); if (LIM[c]) q = LIM[c](q);
+    q.onSnapshot(sn => {
+      S.d[c] = sn.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!sn.metadata.fromCache) S.synced = true;
+      S.err = ''; sched();
+    }, er => { S.err = (er && er.code) || 'error'; sched(); });
+  });
+  setTimeout(() => { if (!S.synced) { S.slow = true; sched(); } }, 10000);
+}
+async function arrancar() {
+  const h = location.hash.slice(1); if (VIEWS.includes(h)) S.view = h;
+  draw();
+  const c = window.claude;
+  if (c && c.use) [DB, USER, ASSETS, DL] = await Promise.all(['db', 'user', 'assets', 'downloads'].map(n => c.use(n).catch(() => null)));
+  S.booted = true; S.caps.db = !!DB; S.caps.upload = !!ASSETS; S.caps.save = !!DL;
+  if (USER) {
+    const me = await USER.me(); S.me = { id: me.id, name: me.name || '' };
+    S.caps.owner = await USER.isOwner(); S.caps.admin = await USER.canEdit(); S.caps.write = await USER.can('data.write');
+    if (S.caps.owner) S.caps.write = true;
+  }
+  if (DB) suscribir();
+  draw();
+}
+arrancar();
+})();
+</script>
