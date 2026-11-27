@@ -112,20 +112,26 @@ function ir(v) {
   S.view = v; S.f = {}; draw(); window.scrollTo(0, 0);
   if (VIEWS.includes(v)) { try { history.replaceState(null, '', '#' + v); } catch (_) { location.hash = v; } }
 }
-const logo = () => `<div class="logo" role="img" aria-label="Kuntur Telecom"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><path d="M5 41 22 17l17 24z" fill="var(--ink)"/><path d="M17.8 12.8A6 6 0 0 1 26.2 12.8M14.2 9.2A11 11 0 0 1 29.8 9.2M10.7 5.7A16 16 0 0 1 33.3 5.7" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"/></svg><div><b>KUNTUR</b><span>TELECOM</span></div></div>`;
+const logo = () => `<div class="logo" role="img" aria-label="Kuntur Telecom"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><path d="M5 41 22 17l17 24z" fill="var(--ink)"/><path d="M17.8 12.8A6 6 0 0 1 26.2 12.8M14.2 9.2A11 11 0 0 1 29.8 9.2M10.7 5.7A16 16 0 0 1 33.3 5.7" fill="none" stroke="#FFC400" stroke-width="3" stroke-linecap="round"/></svg><b>KUNTUR</b><span>TELECOM</span></div>`;
 const fibraStrip = () => `<div class="fibra" title="Código de colores de fibra">${FIBRA.map(f => `<i style="background:${f[1]}"></i>`).join('')}</div>`;
 
 function shell() {
-  const nav = NAV.map(([v, t, i]) => `<button class="nav-item${S.view === v || (S.view === 'ejecutar' && v === 'checklists') ? ' on' : ''}" data-a="ir" data-v="${v}">${ic(i)}<span>${t}</span></button>`).join('');
+  const cur = S.view === 'ejecutar' ? 'checklists' : S.view;
+  const tono = c => (c === '#ffffff' ? '#cfd4d9' : c);
+  const nav = NAV.map(([v, t, i], k) => `<button class="nav-item${cur === v ? ' on' : ''}" data-a="ir" data-v="${v}" style="--c:${tono(FIBRA[k][1])}">${ic(i)}<i class="n">${pad(k + 1)}</i><span>${t}</span></button>`).join('');
   const zs = S.d.zonas.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0));
+  const zona = (zs.find(z => String(z.id) === String(S.zona)) || {}).nombre || 'Todas las zonas';
+  const n = Math.max(0, VIEWS.indexOf(cur)) + 1;
   const estado = S.err ? ['off', 'Sin acceso a datos'] : S.synced ? ['on', 'En línea'] : [S.slow ? 'off' : '', S.slow ? 'Sin respuesta, mostrando datos guardados' : 'Conectando…'];
-  return `<aside class="rail"><div class="brand">${logo()}<small>Enlace de Campo · operaciones de red</small>${fibraStrip()}</div>
-    <nav class="nav">${nav}</nav>
-    <div class="who"><span class="chip acc" style="align-self:flex-start">${esc(rol())}</span><span>${esc(S.me.name || '')}</span></div></aside>
-  <div class="main-col"><div class="topbar"><div class="brandm">${logo()}</div>
+  return `<header class="cab"><div class="cab-band" title="Código de colores de fibra">${FIBRA.map(f => `<i style="background:${tono(f[1])}"></i>`).join('')}</div>
+    <div class="cab-row"><div class="cab-form"><span>FORMATO</span><b>EC-${pad(n)}</b></div>
+    <div class="cab-org"><b>Enlace de Campo</b><small>Hoja de operaciones de red · ${esc(zona)}</small></div>
     <div class="tools"><label class="zsel">Zona <select id="zonaSel" data-i="zona" style="width:auto;min-width:170px">${opts(zs.map(z => [z.id, z.nombre]), S.zona, 'Todas las zonas')}</select></label>
-    <span class="sync ${estado[0]}"><i></i>${esc(estado[1])}</span></div></div>
-    <main class="page">${vista()}</main></div><nav class="tabbar">${nav}</nav>`;
+    <span class="sync ${estado[0]}"><i></i>${esc(estado[1])}</span></div></div></header>
+  <nav class="sep" aria-label="Secciones">${nav}</nav>
+  <main class="page">${vista()}</main>
+  <footer class="pie">${logo()}<div class="who"><span class="chip acc">${esc(rol())}</span><span>${esc(S.me.name || '')}</span></div></footer>
+  <nav class="tabbar" aria-label="Secciones">${nav}</nav>`;
 }
 function vista() {
   if (!S.booted) return `<div class="empty"><h3>Cargando</h3>Conectando con la base de datos…</div>`;
